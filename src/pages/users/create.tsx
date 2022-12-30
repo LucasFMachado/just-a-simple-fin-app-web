@@ -115,7 +115,7 @@ export default function CreateUser() {
                 error={formState.errors.password}
               />
               <Input
-                {...register("password")}
+                {...register("password_confirm")}
                 name="password_confirm"
                 type="password"
                 label="Confirmar Senha"
@@ -141,7 +141,7 @@ export default function CreateUser() {
                 isLoading={formState.isSubmitting}
                 loadingText="Carregando"
               >
-                Salvar
+                Criar
               </Button>
             </HStack>
           </Flex>

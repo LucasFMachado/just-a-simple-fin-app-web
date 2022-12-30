@@ -49,10 +49,6 @@ interface UserFormValues {
 const updateUserFormSchema = object().shape({
   name: string().required("Nome obrigatório"),
   email: string().required("E-mail obrigatório").email("E-mail inválido"),
-  password: string().required("Senha obrigatória"),
-  password_confirm: string()
-    .oneOf([ref("password")], "Senhas não são iguais")
-    .required("Confirmação de senha obrigatória"),
 });
 
 export default function UpdateUser({ hasError, message, user }: IUpdateUser) {

@@ -8,7 +8,7 @@ export function Logo() {
       letterSpacing="tight"
       w="64"
     >
-      Spartan
+      FinAPP
       <Text as="span" ml="1" color="red.500">
         .
       </Text>

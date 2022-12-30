@@ -7,7 +7,7 @@ interface PageTitleProps {
 export function PageTitle({ title }: PageTitleProps) {
   return (
     <Head>
-      <title>Spartan | {title}</title>
+      <title>FinAPP | {title}</title>
     </Head>
   );
 }

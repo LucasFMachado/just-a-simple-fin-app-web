@@ -47,10 +47,10 @@ export default function Home() {
           <Stack spacing="4">
             <Flex as="div" justify="center" mb="4">
               <Image
-                src="/images/logo.png"
+                src="/images/piggy-bank.png"
                 alt="Logo"
-                width={450}
-                height={400}
+                width={200}
+                height={225}
               />
             </Flex>
             <Input
