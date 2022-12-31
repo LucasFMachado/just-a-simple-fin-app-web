@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { api } from "../services/api";
 
 interface IUser {
+  id: string;
   name: string;
   email: string;
 }
@@ -42,15 +43,19 @@ export function AuthProvider({ children }: IAuthProvider) {
     const { "jasfa.token": token } = parseCookies();
 
     if (token) {
-      // Make get user here, and then setUser(response.user)
+      api
+        .get("/users/me")
+        .then(({ data }) => {
+          data && setUser(data);
+        })
+        .catch(() => {
+          signOut();
+        });
     }
   }, []);
 
   async function signIn({ email, password }: ISignInData) {
-    // Receive email and password and
-    // make the signinRequest here sending email and password
-    // and return token and user data
-    const { data } = await api.post("user/authenticate", {
+    const { data } = await api.post("users/authenticate", {
       email,
       password,
     });
@@ -70,7 +75,6 @@ export function AuthProvider({ children }: IAuthProvider) {
 
   function signOut() {
     destroyCookie(undefined, "jasfa.token");
-    destroyCookie(undefined, "jasfa.user");
     router.push("/users");
   }
 

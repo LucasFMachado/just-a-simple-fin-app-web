@@ -58,7 +58,7 @@ export default function ListUsers() {
                   </Text>
                 </Box>
               </Td>
-              {isWideVersion && <Td>{user.createdAt}</Td>}
+              {isWideVersion && <Td>{user.created_at}</Td>}
               <Td>
                 <Actions route="users" id={user.id} />
               </Td>

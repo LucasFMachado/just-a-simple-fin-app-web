@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMutation } from "react-query";
@@ -20,69 +19,54 @@ import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
-import { queryClient } from "../../services/queryClient";
 import { toastError } from "../../utils/toastOptions";
-import { getUser } from "../../requests/users";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 
-interface IUser {
-  id: string;
-  name: string;
-  email: string;
-  created_at: string;
+interface IChangePassword {
+  slug: string;
 }
 
-interface IUpdateUser {
-  hasError: boolean;
-  message?: string;
-  user?: IUser;
-}
-
-interface UserFormValues {
+interface ChangePasswordFormValues {
   id: string;
-  name: string;
-  email: string;
+  old_password: string;
+  new_password: string;
+  new_password_confirm: string;
 }
 
 const updateUserFormSchema = object().shape({
-  name: string().required("Nome obrigatório"),
-  email: string().required("E-mail obrigatório").email("E-mail inválido"),
+  old_password: string().required("old password is not defined!"),
+  new_password: string().required("New password is not defined!"),
+  new_password_confirm: string()
+    .oneOf([ref("new_password")], "Passwords does not match!")
+    .required("New password confirmation is not defined!"),
 });
 
-export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
+export default function ChangePassword({ slug }: IChangePassword) {
   const router = useRouter();
   const toast = useToast();
 
-  useEffect(() => {
-    if (hasError && message) {
-      toast(toastError(message));
-      throw Error;
-    }
-  }, []);
+  const { register, handleSubmit, formState } =
+    useForm<ChangePasswordFormValues>({
+      defaultValues: {
+        id: slug,
+        old_password: "",
+        new_password: "",
+        new_password_confirm: "",
+      },
+      resolver: yupResolver(updateUserFormSchema),
+    });
 
-  const { register, handleSubmit, formState } = useForm<UserFormValues>({
-    defaultValues: {
-      id: user?.id,
-      name: user?.name,
-      email: user?.email,
-    },
-    resolver: yupResolver(updateUserFormSchema),
-  });
-
-  async function handleUpdateUser(values: UserFormValues) {
+  async function handleUpdateUser(values: ChangePasswordFormValues) {
     await updateUser.mutateAsync(values);
-    router.push("/users");
+    router.push("/dashboard");
   }
 
   const updateUser = useMutation(
-    async (user: UserFormValues) => {
-      await api.put(`users/${user.id}`, user);
+    async (values: ChangePasswordFormValues) => {
+      await api.put(`/users/change-password/${values.id}`, values);
     },
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries("users");
-      },
       onError: ({ response }) => {
         toast(toastError(response?.data?.message));
         throw Error;
@@ -93,10 +77,8 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
   return (
     <Box>
       <Header />
-
       <Flex w="100%" my="6" maxWidth={1480} mx="auto" px="6">
         <Sidebar />
-
         <Box
           as="form"
           flex="1"
@@ -106,7 +88,7 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
           onSubmit={handleSubmit(handleUpdateUser)}
         >
           <Heading size="lg" fontWeight="normal">
-            Alterar usuário
+            Alterar senha
           </Heading>
 
           <Divider my="6" borderColor="gray.700" />
@@ -114,17 +96,25 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
           <VStack spacing={["6", "8"]}>
             <SimpleGrid minChildWidth="240px" spacing={["6", "8"]} w="100%">
               <Input
-                {...register("name")}
-                type="text"
-                label="Nome"
-                error={formState.errors.name}
+                {...register("old_password")}
+                name="old_password"
+                type="password"
+                label="Antiga senha"
+                error={formState.errors.old_password}
               />
               <Input
-                {...register("email")}
-                name="email"
-                type="email"
-                label="E-mail"
-                error={formState.errors.email}
+                {...register("new_password")}
+                name="new_password"
+                type="password"
+                label="Nova senha"
+                error={formState.errors.new_password}
+              />
+              <Input
+                {...register("new_password_confirm")}
+                name="new_password_confirm"
+                type="password"
+                label="Confirmar nova senha"
+                error={formState.errors.new_password_confirm}
               />
             </SimpleGrid>
           </VStack>
@@ -145,7 +135,7 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
                 colorScheme="red"
                 isLoading={formState.isSubmitting}
                 loadingText="Carregando"
-                disabled={formState.isSubmitting || hasError}
+                disabled={formState.isSubmitting}
               >
                 Salvar
               </Button>
@@ -169,16 +159,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  const { hasError, data, message } = await getUser(
-    String(ctx.params?.slug),
-    ctx
-  );
-
   return {
     props: {
-      hasError,
-      user: data,
-      message,
+      slug: String(ctx.params?.slug),
     },
   };
 };

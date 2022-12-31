@@ -6,7 +6,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export async function getUser(
@@ -16,13 +16,13 @@ export async function getUser(
   try {
     const axiosApi = ctx ? getAPIClient(ctx) : api;
 
-    const { data } = await axiosApi.get(`user/${userId}`);
+    const { data } = await axiosApi.get(`users/${userId}`);
 
     const user = {
       id: data.id,
       name: data.name,
       email: data.email.toLowerCase(),
-      createdAt: new Date(data.createdAt).toLocaleDateString("pt-BR", {
+      created_at: new Date(data.created_at).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
         year: "numeric",
@@ -48,7 +48,7 @@ export async function getUsersList(
   take: number
 ): Promise<IGetListResponse<User>> {
   try {
-    const { data } = await api.get(`user?page=${page}&take=${take}`);
+    const { data } = await api.get(`users?page=${page}&take=${take}`);
 
     const count = Number(data?.count);
 
@@ -56,7 +56,7 @@ export async function getUsersList(
       id: user.id,
       name: user.name,
       email: user.email.toLowerCase(),
-      createdAt: new Date(user.createdAt).toLocaleDateString("pt-BR", {
+      created_at: new Date(user.created_at).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
         year: "numeric",

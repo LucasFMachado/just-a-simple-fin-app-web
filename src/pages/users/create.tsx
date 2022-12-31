@@ -55,14 +55,14 @@ export default function CreateUser() {
 
   const createUser = useMutation(
     async (user: UserValues) => {
-      await api.post("user", user);
+      await api.post("users", user);
     },
     {
       onSuccess: () => {
         queryClient.invalidateQueries("users");
       },
       onError: ({ response }) => {
-        toast(toastError(response.statusText));
+        toast(toastError(response?.data?.message));
         throw Error;
       },
     }

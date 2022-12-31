@@ -13,19 +13,19 @@ const siblingsCount = 1;
 function generatePagesArray(from: number, to: number) {
   return [...new Array(to - from)]
     .map((_, index) => from + index + 1)
-    .filter((page) => page > 0);
+    .filter((page) => page >= 0);
 }
 
 export function Pagination({
   totalCountRegisters,
   registerPerPage = 10,
-  currentPage = 1,
+  currentPage = 0,
   onPageChange,
 }: PaginationProps) {
-  const lastPage = Math.ceil(totalCountRegisters / registerPerPage);
+  const lastPage = Math.floor(totalCountRegisters / registerPerPage);
 
   const previousPages =
-    currentPage > 1
+    currentPage > 0
       ? generatePagesArray(currentPage - 1 - siblingsCount, currentPage - 1)
       : [];
 

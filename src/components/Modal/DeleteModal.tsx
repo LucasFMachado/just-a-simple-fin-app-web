@@ -43,7 +43,7 @@ export function DeleteModal({ isOpen, onClose, route, id }: DeleteModalProps) {
         onClose();
       },
       onError: ({ response }) => {
-        toast(toastError(response.statusText));
+        toast(toastError(response?.data?.message));
         throw Error;
       },
     }
