@@ -72,7 +72,7 @@ export default function Home() {
           <Button
             type="submit"
             mt="6"
-            colorScheme="red"
+            colorScheme="teal"
             size="lg"
             isLoading={formState.isSubmitting}
           >

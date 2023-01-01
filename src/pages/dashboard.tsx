@@ -1,9 +1,14 @@
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-// import { getAPIClient } from "../services/axios";
+import { Sidebar } from "../components/Sidebar";
 
 export default function Dashboard() {
-  return <h1>Dashboard</h1>;
+  return (
+    <>
+      <Sidebar />
+      <h1>Dashboard</h1>
+    </>
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

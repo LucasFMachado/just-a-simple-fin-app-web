@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
-import { object, string } from "yup";
+import { number, object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
@@ -22,35 +22,48 @@ import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 import { queryClient } from "../../services/queryClient";
 import { toastError } from "../../utils/toastOptions";
-import { getUser } from "../../requests/users";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
+import { Select } from "../../components/Form/Select";
+import { IOption } from "../../interfaces";
+import { getTransaction } from "../../requests/transactions";
+import { getCategoryOptions } from "../../requests/categories";
+import { Number } from "../../components/Form/Number";
 
-interface IUser {
+interface ITransaction {
   id: string;
-  name: string;
-  email: string;
+  title: string;
+  category_id: string;
+  amount: number;
   created_at: string;
 }
 
-interface IUpdateUser {
+interface IUpdateTransaction {
   hasError: boolean;
   message?: string;
-  user?: IUser;
+  transaction?: ITransaction;
+  categoryOptions: IOption[];
 }
 
-interface UserFormValues {
+interface TransactionFormValues {
   id: string;
-  name: string;
-  email: string;
+  title: string;
+  category_id: string;
+  amount: number;
 }
 
-const updateUserFormSchema = object().shape({
-  name: string().required("Nome obrigatório"),
-  email: string().required("E-mail obrigatório").email("E-mail inválido"),
+const updateTransactionFormSchema = object().shape({
+  title: string().required("Título obrigatório"),
+  category_id: string().required("Categoria obrigatória"),
+  amount: number().positive("Valor válido").required("Valor obrigatório"),
 });
 
-export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
+export default function UpdateTransaction({
+  hasError,
+  message,
+  transaction,
+  categoryOptions,
+}: IUpdateTransaction) {
   const router = useRouter();
   const toast = useToast();
 
@@ -61,27 +74,28 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
     }
   }, []);
 
-  const { register, handleSubmit, formState } = useForm<UserFormValues>({
+  const { register, handleSubmit, formState } = useForm<TransactionFormValues>({
     defaultValues: {
-      id: user?.id,
-      name: user?.name,
-      email: user?.email,
+      id: transaction?.id,
+      title: transaction?.title,
+      category_id: transaction?.category_id,
+      amount: transaction?.amount,
     },
-    resolver: yupResolver(updateUserFormSchema),
+    resolver: yupResolver(updateTransactionFormSchema),
   });
 
-  async function handleUpdateUser(values: UserFormValues) {
-    await updateUser.mutateAsync(values);
-    router.push("/users");
+  async function handleUpdateTransaction(values: TransactionFormValues) {
+    await updateTransaction.mutateAsync(values);
+    router.push("/transactions");
   }
 
-  const updateUser = useMutation(
-    async (user: UserFormValues) => {
-      await api.put(`users/${user.id}`, user);
+  const updateTransaction = useMutation(
+    async (transaction: TransactionFormValues) => {
+      await api.put(`transactions/${transaction.id}`, transaction);
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("users");
+        queryClient.invalidateQueries("transactions");
       },
       onError: ({ response }) => {
         toast(toastError(response?.data?.message));
@@ -103,10 +117,10 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
           borderRadius={8}
           bg="gray.800"
           p={["6", "8"]}
-          onSubmit={handleSubmit(handleUpdateUser)}
+          onSubmit={handleSubmit(handleUpdateTransaction)}
         >
           <Heading size="lg" fontWeight="normal">
-            Alterar usuário
+            Alterar transação
           </Heading>
 
           <Divider my="6" borderColor="gray.700" />
@@ -114,25 +128,31 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
           <VStack spacing={["6", "8"]}>
             <SimpleGrid minChildWidth="240px" spacing={["6", "8"]} w="100%">
               <Input
-                {...register("name")}
-                name="name"
+                {...register("title")}
+                name="title"
                 type="text"
-                label="Nome"
-                error={formState.errors.name}
+                label="Título"
+                error={formState.errors.title}
               />
-              <Input
-                {...register("email")}
-                name="email"
-                type="email"
-                label="E-mail"
-                error={formState.errors.email}
+              <Select
+                {...register("category_id")}
+                name="category_id"
+                options={categoryOptions}
+                label="Tipo"
+                error={formState.errors.category_id}
+              />
+              <Number
+                {...register("amount")}
+                name="amount"
+                label="Título"
+                error={formState.errors.amount}
               />
             </SimpleGrid>
           </VStack>
 
           <Flex mt={["6", "8"]} justify="flex-end">
             <HStack spacing="4">
-              <Link href="/users" passHref>
+              <Link href="/transactions" passHref>
                 <Button
                   as="button"
                   colorScheme="whiteAlpha"
@@ -170,15 +190,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  const { hasError, data, message } = await getUser(
+  const { hasError, data, message } = await getTransaction(
     String(ctx.params?.slug),
     ctx
   );
 
+  const { options } = await getCategoryOptions(ctx);
+
   return {
     props: {
       hasError,
-      user: data,
+      transaction: data,
+      categoryOptions: options,
       message,
     },
   };

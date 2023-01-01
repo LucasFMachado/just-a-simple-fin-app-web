@@ -132,7 +132,7 @@ export default function ChangePassword({ slug }: IChangePassword) {
               </Link>
               <Button
                 type="submit"
-                colorScheme="red"
+                colorScheme="teal"
                 isLoading={formState.isSubmitting}
                 loadingText="Carregando"
                 disabled={formState.isSubmitting}

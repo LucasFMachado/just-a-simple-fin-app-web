@@ -10,13 +10,13 @@ import {
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { useUsersList } from "../../hooks/useUsers";
+import { useCategoriesList } from "../../hooks/useCategories";
 import { Container } from "../../components/Table/Container";
 import { Actions } from "../../components/Table/Actions";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 
-export default function ListUsers() {
+export default function ListCategories() {
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
@@ -24,12 +24,12 @@ export default function ListUsers() {
 
   const [page, setPage] = useState(0);
   const [take] = useState(10);
-  const { data, isLoading, isFetching, error } = useUsersList(page, take);
+  const { data, isLoading, isFetching, error } = useCategoriesList(page, take);
 
   return (
     <Container
       title="Usuários"
-      createRoute="/users/create"
+      createRoute="/categories/create"
       isLoading={isLoading}
       isFetching={isFetching}
       error={error}
@@ -46,21 +46,21 @@ export default function ListUsers() {
           </Tr>
         </Thead>
         <Tbody>
-          {data?.list.map((user) => (
-            <Tr key={user.id}>
+          {data?.list.map((category) => (
+            <Tr key={category.id}>
               <Td>
                 <Box>
                   <Text color="teal.400">
-                    <Text fontWeight="bold">{user.name}</Text>
+                    <Text fontWeight="bold">{category.title}</Text>
                   </Text>
-                  <Text fontSize="small" color="gray.300">
-                    {user.email}
-                  </Text>
+                  {/* <Text fontSize="small" color="gray.300">
+                    {category.email}
+                  </Text> */}
                 </Box>
               </Td>
-              {isWideVersion && <Td>{user.created_at}</Td>}
+              {isWideVersion && <Td>{category.created_at}</Td>}
               <Td>
-                <Actions route="users" id={user.id} />
+                <Actions route="categories" id={category.id} />
               </Td>
             </Tr>
           ))}

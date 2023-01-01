@@ -9,7 +9,7 @@ export function Logo() {
       w="64"
     >
       FinAPP
-      <Text as="span" ml="1" color="red.500">
+      <Text as="span" ml="1" color="teal.500">
         .
       </Text>
     </Text>

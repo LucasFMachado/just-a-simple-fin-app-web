@@ -23,43 +23,44 @@ import { queryClient } from "../../services/queryClient";
 import { toastError } from "../../utils/toastOptions";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
+import { Select } from "../../components/Form/Select";
+import { getTypeOptions } from "../../requests/types";
+import { IOption } from "../../interfaces";
 
-type UserValues = {
-  name: string;
-  email: string;
-  password: string;
-  password_confirm: string;
+interface ICreateCategory {
+  typeOptions: IOption[];
+}
+
+type CategoryValues = {
+  title: string;
+  type_id: string;
 };
 
-const createUserFormSchema = object().shape({
-  name: string().required("Nome obrigatório"),
-  email: string().required("E-mail obrigatório").email("E-mail inválido"),
-  password: string().required("Senha obrigatória"),
-  password_confirm: string()
-    .oneOf([ref("password")], "Senhas não são iguais")
-    .required("Confirmação de senha obrigatória"),
+const createCategoryFormSchema = object().shape({
+  title: string().required("Título obrigatório"),
+  type_id: string().required("Tipo obrigatório"),
 });
 
-export default function CreateUser() {
+export default function CreateCategory({ typeOptions }: ICreateCategory) {
   const router = useRouter();
   const toast = useToast();
 
-  const { register, handleSubmit, formState } = useForm<UserValues>({
-    resolver: yupResolver(createUserFormSchema),
+  const { register, handleSubmit, formState } = useForm<CategoryValues>({
+    resolver: yupResolver(createCategoryFormSchema),
   });
 
-  async function handleCreateUser(values: UserValues) {
-    await createUser.mutateAsync(values);
-    router.push("/users");
+  async function handleCreateCategory(values: CategoryValues) {
+    await createCategory.mutateAsync(values);
+    router.push("/categories");
   }
 
-  const createUser = useMutation(
-    async (user: UserValues) => {
-      await api.post("users", user);
+  const createCategory = useMutation(
+    async (category: CategoryValues) => {
+      await api.post("categories", category);
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("users");
+        queryClient.invalidateQueries("categories");
       },
       onError: ({ response }) => {
         toast(toastError(response?.data?.message));
@@ -81,10 +82,10 @@ export default function CreateUser() {
           borderRadius={8}
           bg="gray.800"
           p={["6", "8"]}
-          onSubmit={handleSubmit(handleCreateUser)}
+          onSubmit={handleSubmit(handleCreateCategory)}
         >
           <Heading size="lg" fontWeight="normal">
-            Criar usuário
+            Criar categoria
           </Heading>
 
           <Divider my="6" borderColor="gray.700" />
@@ -92,41 +93,25 @@ export default function CreateUser() {
           <VStack spacing={["6", "8"]}>
             <SimpleGrid minChildWidth="240px" spacing={["6", "8"]} w="100%">
               <Input
-                {...register("name")}
-                name="name"
+                {...register("title")}
+                name="title"
                 type="text"
-                label="Nome"
-                error={formState.errors.name}
+                label="Título"
+                error={formState.errors.title}
               />
-              <Input
-                {...register("email")}
-                name="email"
-                type="email"
-                label="E-mail"
-                error={formState.errors.email}
-              />
-            </SimpleGrid>
-            <SimpleGrid minChildWidth="240px" spacing={["6", "8"]} w="100%">
-              <Input
-                {...register("password")}
-                name="password"
-                type="password"
-                label="Senha"
-                error={formState.errors.password}
-              />
-              <Input
-                {...register("password_confirm")}
-                name="password_confirm"
-                type="password"
-                label="Confirmar Senha"
-                error={formState.errors.password_confirm}
+              <Select
+                {...register("type_id")}
+                name="type_id"
+                options={typeOptions}
+                label="Tipo"
+                error={formState.errors.type_id}
               />
             </SimpleGrid>
           </VStack>
 
           <Flex mt={["6", "8"]} justify="flex-end">
             <HStack spacing="4">
-              <Link href="/users" passHref>
+              <Link href="/categories" passHref>
                 <Button
                   as="button"
                   colorScheme="whiteAlpha"
@@ -163,7 +148,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
+  const { options } = await getTypeOptions(ctx);
+
   return {
-    props: {},
+    props: {
+      typeOptions: options,
+    },
   };
 };

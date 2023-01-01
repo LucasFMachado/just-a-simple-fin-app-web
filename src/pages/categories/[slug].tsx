@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
-import { object, string } from "yup";
+import { boolean, object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
@@ -22,35 +22,48 @@ import { Sidebar } from "../../components/Sidebar";
 import { api } from "../../services/api";
 import { queryClient } from "../../services/queryClient";
 import { toastError } from "../../utils/toastOptions";
-import { getUser } from "../../requests/users";
+import { getCategory } from "../../requests/categories";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
+import { Select } from "../../components/Form/Select";
+import { getTypeOptions } from "../../requests/types";
+import { IOption } from "../../interfaces";
+import { Switch } from "../../components/Form/Switch";
 
-interface IUser {
+interface ICategory {
   id: string;
-  name: string;
-  email: string;
+  title: string;
+  type_id: string;
+  active: boolean;
   created_at: string;
 }
 
-interface IUpdateUser {
+interface IUpdateCategory {
   hasError: boolean;
   message?: string;
-  user?: IUser;
+  category?: ICategory;
+  typeOptions: IOption[];
 }
 
-interface UserFormValues {
+interface CategoryFormValues {
   id: string;
-  name: string;
-  email: string;
+  title: string;
+  type_id: string;
+  active: boolean;
 }
 
-const updateUserFormSchema = object().shape({
-  name: string().required("Nome obrigatório"),
-  email: string().required("E-mail obrigatório").email("E-mail inválido"),
+const updateCategoryFormSchema = object().shape({
+  title: string().required("Título obrigatório"),
+  type_id: string().required("Tipo obrigatório"),
+  active: boolean(),
 });
 
-export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
+export default function UpdateCategory({
+  hasError,
+  message,
+  category,
+  typeOptions,
+}: IUpdateCategory) {
   const router = useRouter();
   const toast = useToast();
 
@@ -61,27 +74,28 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
     }
   }, []);
 
-  const { register, handleSubmit, formState } = useForm<UserFormValues>({
+  const { register, handleSubmit, formState } = useForm<CategoryFormValues>({
     defaultValues: {
-      id: user?.id,
-      name: user?.name,
-      email: user?.email,
+      id: category?.id,
+      title: category?.title,
+      type_id: category?.type_id,
+      active: category?.active,
     },
-    resolver: yupResolver(updateUserFormSchema),
+    resolver: yupResolver(updateCategoryFormSchema),
   });
 
-  async function handleUpdateUser(values: UserFormValues) {
-    await updateUser.mutateAsync(values);
-    router.push("/users");
+  async function handleUpdateCategory(values: CategoryFormValues) {
+    await updateCategory.mutateAsync(values);
+    router.push("/categories");
   }
 
-  const updateUser = useMutation(
-    async (user: UserFormValues) => {
-      await api.put(`users/${user.id}`, user);
+  const updateCategory = useMutation(
+    async (category: CategoryFormValues) => {
+      await api.put(`categories/${category.id}`, category);
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("users");
+        queryClient.invalidateQueries("categories");
       },
       onError: ({ response }) => {
         toast(toastError(response?.data?.message));
@@ -103,10 +117,10 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
           borderRadius={8}
           bg="gray.800"
           p={["6", "8"]}
-          onSubmit={handleSubmit(handleUpdateUser)}
+          onSubmit={handleSubmit(handleUpdateCategory)}
         >
           <Heading size="lg" fontWeight="normal">
-            Alterar usuário
+            Alterar categoria
           </Heading>
 
           <Divider my="6" borderColor="gray.700" />
@@ -114,25 +128,31 @@ export default function UpdateUser({ hasError, message, user }: IUpdateUser) {
           <VStack spacing={["6", "8"]}>
             <SimpleGrid minChildWidth="240px" spacing={["6", "8"]} w="100%">
               <Input
-                {...register("name")}
-                name="name"
+                {...register("title")}
+                name="title"
                 type="text"
-                label="Nome"
-                error={formState.errors.name}
+                label="Título"
+                error={formState.errors.title}
               />
-              <Input
-                {...register("email")}
-                name="email"
-                type="email"
-                label="E-mail"
-                error={formState.errors.email}
+              <Select
+                {...register("type_id")}
+                name="type_id"
+                options={typeOptions}
+                label="Tipo"
+                error={formState.errors.type_id}
+              />
+              <Switch
+                {...register("active")}
+                name="active"
+                label="Ativo"
+                error={formState.errors.active}
               />
             </SimpleGrid>
           </VStack>
 
           <Flex mt={["6", "8"]} justify="flex-end">
             <HStack spacing="4">
-              <Link href="/users" passHref>
+              <Link href="/categories" passHref>
                 <Button
                   as="button"
                   colorScheme="whiteAlpha"
@@ -170,15 +190,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  const { hasError, data, message } = await getUser(
+  const { hasError, data, message } = await getCategory(
     String(ctx.params?.slug),
     ctx
   );
 
+  const { options } = await getTypeOptions(ctx);
+
   return {
     props: {
       hasError,
-      user: data,
+      category: data,
+      typeOptions: options,
       message,
     },
   };
