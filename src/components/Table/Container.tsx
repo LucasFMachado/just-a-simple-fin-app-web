@@ -14,7 +14,7 @@ import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { RiAddLine } from "react-icons/ri";
 import { Pagination } from "./Pagination";
-import { Search } from "./Search";
+// import { Search } from "./Search";
 
 interface ContainerProps {
   title: string;
@@ -47,7 +47,7 @@ export function Container({
       <Flex w="100%" my="3" maxWidth={1480} mx="auto" px="6">
         <Sidebar />
 
-        <Box flex="1" borderRadius={8} bg="gray.800" p="6">
+        <Box flex="1" borderRadius={8} bg="gray.800" p="3">
           <Flex mb="2" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
               <Text fontWeight="bold">{title}</Text>
@@ -61,12 +61,12 @@ export function Container({
             <NextLink href={createRoute} passHref>
               <Button
                 as="button"
-                size="sm"
-                fontSize="sm"
+                size="md"
+                fontSize="md"
                 colorScheme="teal"
                 leftIcon={<Icon as={RiAddLine} fontSize="20" />}
               >
-                Criar novo
+                Adicionar
               </Button>
             </NextLink>
 

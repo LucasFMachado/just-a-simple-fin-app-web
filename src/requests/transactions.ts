@@ -1,19 +1,11 @@
-import { IGetResponse, IGetListResponse } from "../interfaces";
+import { IGetResponse, IGetListResponse, ITransaction } from "../interfaces";
 import { api } from "../services/api";
 import { getAPIClient } from "../services/axios";
-
-interface Transaction {
-  id: string;
-  title: string;
-  category_id: string;
-  amount: number;
-  created_at: string;
-}
 
 export async function getTransaction(
   transactionId: string,
   ctx?: any
-): Promise<IGetResponse<Transaction>> {
+): Promise<IGetResponse<ITransaction>> {
   try {
     const axiosApi = ctx ? getAPIClient(ctx) : api;
 
@@ -29,7 +21,7 @@ export async function getTransaction(
         month: "long",
         year: "numeric",
       }),
-    };
+    } as ITransaction;
 
     return {
       data: transaction,
@@ -48,23 +40,23 @@ export async function getTransaction(
 export async function getTransactionsList(
   page: number,
   take: number
-): Promise<IGetListResponse<Transaction>> {
+): Promise<IGetListResponse<ITransaction>> {
   try {
     const { data } = await api.get(`transactions?page=${page}&take=${take}`);
 
     const count = Number(data?.count);
 
-    const list = data?.list.map((transaction: Transaction) => ({
+    const list = data?.list.map((transaction: ITransaction) => ({
       id: transaction.id,
       title: transaction.title,
       category_id: transaction.category_id,
-      amount: transaction.amount,
+      amount: Number(transaction.amount).toFixed(2),
       created_at: new Date(transaction.created_at).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
         year: "numeric",
       }),
-    }));
+    })) as ITransaction[];
 
     return {
       list,

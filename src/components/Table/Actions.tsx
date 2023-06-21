@@ -12,13 +12,13 @@ export function Actions({ route, id }: Actionsprops) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Flex justify="center">
+    <Flex justify="center" mt="3">
       <NextLink href={`/${route}/${id}`} passHref>
         <Button
           as="button"
-          size="sm"
-          fontSize="sm"
-          colorScheme="blue"
+          size="md"
+          fontSize="md"
+          colorScheme="cyan"
           leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
         >
           Alterar
@@ -26,10 +26,10 @@ export function Actions({ route, id }: Actionsprops) {
       </NextLink>
       <Button
         onClick={onOpen}
-        size="sm"
-        ml="1"
-        fontSize="sm"
-        colorScheme="red"
+        size="md"
+        ml="3"
+        fontSize="md"
+        colorScheme="orange"
         leftIcon={<Icon as={RiDeleteBinLine} fontSize="16" />}
       >
         Deletar

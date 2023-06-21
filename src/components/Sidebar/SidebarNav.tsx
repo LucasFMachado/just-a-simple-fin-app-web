@@ -20,7 +20,7 @@ export function SidebarNav() {
           Dashboard
         </NavLink>
         <NavLink href="/transactions" icon={MdAttachMoney}>
-          Movimentos
+          Transações
         </NavLink>
         <NavLink href="/users" icon={MdOutlinePerson}>
           Usuários

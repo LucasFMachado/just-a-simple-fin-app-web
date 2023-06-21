@@ -27,16 +27,8 @@ import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import { Select } from "../../components/Form/Select";
 import { getTypeOptions } from "../../requests/types";
-import { IOption } from "../../interfaces";
+import { ICategory, IOption } from "../../interfaces";
 import { Switch } from "../../components/Form/Switch";
-
-interface ICategory {
-  id: string;
-  title: string;
-  type_id: string;
-  active: boolean;
-  created_at: string;
-}
 
 interface IUpdateCategory {
   hasError: boolean;

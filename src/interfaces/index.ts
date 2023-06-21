@@ -16,3 +16,27 @@ export interface IOption {
 export interface IGetOptionsResponse {
   options: IOption[];
 }
+
+export interface IType {
+  id: string;
+  title: string;
+  active: boolean;
+  created_at: string;
+}
+
+export interface ICategory {
+  id: string;
+  title: string;
+  type_id: string;
+  type: IType;
+  active: boolean;
+  created_at: string;
+}
+
+export interface ITransaction {
+  id: string;
+  title: string;
+  category_id: string;
+  amount: string;
+  created_at: string;
+}

@@ -8,7 +8,7 @@ import {
   Tr,
   Td,
   Text,
-  useBreakpointValue,
+  Flex,
 } from "@chakra-ui/react";
 import { useTransactionsList } from "../../hooks/useTransactions";
 import { Container } from "../../components/Table/Container";
@@ -17,11 +17,7 @@ import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 
 export default function ListTransactions() {
-  const isWideVersion = useBreakpointValue({
-    base: false,
-    lg: true,
-  });
-
+  const [lineChecked, setLineChecked] = useState("");
   const [page, setPage] = useState(0);
   const [take] = useState(10);
   const { data, isLoading, isFetching, error } = useTransactionsList(
@@ -31,7 +27,7 @@ export default function ListTransactions() {
 
   return (
     <Container
-      title="Usuários"
+      title="Transações"
       createRoute="/transactions/create"
       isLoading={isLoading}
       isFetching={isFetching}
@@ -43,27 +39,25 @@ export default function ListTransactions() {
       <Table colorScheme="whiteAlpha">
         <Thead>
           <Tr>
-            <Th>Usuário</Th>
-            {isWideVersion && <Th>Data de Cadastro</Th>}
-            <Th w="8"></Th>
+            <Th px="1">Transação</Th>
           </Tr>
         </Thead>
         <Tbody>
           {data?.list.map((transaction) => (
-            <Tr key={transaction.id}>
-              <Td>
+            <Tr
+              key={transaction.id}
+              onClick={() => setLineChecked(transaction.id)}
+            >
+              <Td px="1">
                 <Box>
-                  <Text color="teal.400">
-                    <Text fontWeight="bold">{transaction.title}</Text>
+                  <Text fontWeight="bold" color="teal.400" mb="1">
+                    {transaction.title}
                   </Text>
-                  {/* <Text fontSize="small" color="gray.300">
-                    {transaction.email}
-                  </Text> */}
+                  <Text>R$ {transaction.amount}</Text>
                 </Box>
-              </Td>
-              {isWideVersion && <Td>{transaction.created_at}</Td>}
-              <Td>
-                <Actions route="transactions" id={transaction.id} />
+                {lineChecked == transaction.id && (
+                  <Actions route="transactions" id={transaction.id} />
+                )}
               </Td>
             </Tr>
           ))}

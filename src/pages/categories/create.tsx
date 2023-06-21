@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
-import { object, ref, string } from "yup";
+import { object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,

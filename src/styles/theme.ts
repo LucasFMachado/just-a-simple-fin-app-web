@@ -11,6 +11,17 @@ export const theme = extendTheme({
         bg: "gray.900",
         color: "gray.50",
       },
+      html: {
+        "@media (max-width: 960px)": {
+          fontSize: "93.75%",
+        },
+        "@media (max-width: 768px)": {
+          fontSize: "87.5%",
+        },
+        "@media (max-width: 600px)": {
+          fontSize: "81.25%",
+        },
+      },
     },
   },
 });

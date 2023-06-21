@@ -3,22 +3,15 @@ import {
   IGetListResponse,
   IGetOptionsResponse,
   IOption,
+  ICategory,
 } from "../interfaces";
 import { api } from "../services/api";
 import { getAPIClient } from "../services/axios";
 
-interface Category {
-  id: string;
-  title: string;
-  type_id: string;
-  active: boolean;
-  created_at: string;
-}
-
 export async function getCategory(
   categoryId: string,
   ctx?: any
-): Promise<IGetResponse<Category>> {
+): Promise<IGetResponse<ICategory>> {
   try {
     const axiosApi = ctx ? getAPIClient(ctx) : api;
 
@@ -28,13 +21,14 @@ export async function getCategory(
       id: data.id,
       title: data.title,
       type_id: data.type_id,
+      type: data.type,
       active: data.active,
       created_at: new Date(data.created_at).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
         year: "numeric",
       }),
-    };
+    } as ICategory;
 
     return {
       data: category,
@@ -53,23 +47,24 @@ export async function getCategory(
 export async function getCategoriesList(
   page: number,
   take: number
-): Promise<IGetListResponse<Category>> {
+): Promise<IGetListResponse<ICategory>> {
   try {
     const { data } = await api.get(`categories?page=${page}&take=${take}`);
 
     const count = Number(data?.count);
 
-    const list = data?.list.map((category: Category) => ({
+    const list = data?.list.map((category: ICategory) => ({
       id: category.id,
       title: category.title,
       type_id: category.type_id,
+      type: category.type,
       active: category.active,
       created_at: new Date(category.created_at).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
         year: "numeric",
       }),
-    }));
+    })) as ICategory[];
 
     return {
       list,

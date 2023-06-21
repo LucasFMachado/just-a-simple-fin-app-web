@@ -114,7 +114,7 @@ export default function CreateTransaction({
               <Number
                 {...register("amount")}
                 name="amount"
-                label="Título"
+                label="Valor"
                 error={formState.errors.amount}
               />
             </SimpleGrid>

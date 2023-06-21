@@ -25,18 +25,10 @@ import { toastError } from "../../utils/toastOptions";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import { Select } from "../../components/Form/Select";
-import { IOption } from "../../interfaces";
+import { IOption, ITransaction } from "../../interfaces";
 import { getTransaction } from "../../requests/transactions";
 import { getCategoryOptions } from "../../requests/categories";
 import { Number } from "../../components/Form/Number";
-
-interface ITransaction {
-  id: string;
-  title: string;
-  category_id: string;
-  amount: number;
-  created_at: string;
-}
 
 interface IUpdateTransaction {
   hasError: boolean;
@@ -49,7 +41,7 @@ interface TransactionFormValues {
   id: string;
   title: string;
   category_id: string;
-  amount: number;
+  amount: string;
 }
 
 const updateTransactionFormSchema = object().shape({
@@ -144,7 +136,7 @@ export default function UpdateTransaction({
               <Number
                 {...register("amount")}
                 name="amount"
-                label="Título"
+                label="Valor"
                 error={formState.errors.amount}
               />
             </SimpleGrid>
